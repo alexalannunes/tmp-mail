@@ -8,26 +8,9 @@ import {
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
-import { useQuery } from "@tanstack/react-query";
 import { FaChevronDown } from "react-icons/fa";
-import { CreateAccountFields, Domain, DomainFieldProps } from "./types";
-import { api } from "../../infra/http";
-
-// move this component and create account dialog to features folder
-// header just implement
-
-async function fetchDomains(): Promise<Domain> {
-  const req = await api.get<Domain>("/domains");
-  return req.data;
-}
-
-function useGetDomains() {
-  return useQuery({
-    queryKey: ["domains"],
-    queryFn: fetchDomains,
-    staleTime: Infinity,
-  });
-}
+import { CreateAccountFields, DomainFieldProps } from "./types";
+import { useGetDomains } from "./use-get-domains";
 
 export function DomainField({ onChange, value }: DomainFieldProps) {
   const [localValue, setLocalValue] = useState(value);

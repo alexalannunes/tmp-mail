@@ -24,8 +24,8 @@ import {
   useAccount,
   useAccountDispatch,
 } from "../../data/context/account-context";
-import { CreateAccountDialog } from "./create-account";
-import { RemoveAccountDialog } from "./remove-account";
+import { CreateAccountDialog } from "../../features/account/create-account";
+import { RemoveAccountDialog } from "../../features/account/remove-account";
 
 function HeaderCurrentMail({ email }: { email: string }) {
   const account = useAccount();
@@ -182,9 +182,9 @@ export function Header() {
       <CreateAccountDialog
         onClose={onClose}
         isOpen={isOpen}
-        onOk={(data) => {
-          console.log(data);
-        }}
+        // onOk={(data) => {
+        //   console.log(data);
+        // }}
       />
 
       <RemoveAccountDialog

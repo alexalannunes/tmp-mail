@@ -11,7 +11,7 @@ export interface CreateAccountFields {
 }
 
 export interface CreateAccountDialogProps {
-  onOk: (values: CreateAccountFields) => void;
+  // onOk: (values: CreateAccountFields) => void;
   onClose: () => void;
   isOpen: boolean;
 }
@@ -39,4 +39,26 @@ export interface Domain {
     createdAt: string;
     updatedAt: string;
   }[];
+}
+
+export interface CreateAccountRequest
+  extends Omit<CreateAccountFields, "domain" | "username"> {
+  address: string;
+}
+
+export interface GetTokenResponse {
+  token: string;
+  "@id": string;
+  id: string;
+}
+
+export interface ErrorResponse {
+  "@id": string;
+  "@type": string;
+  status: number;
+  detail: string;
+  "hydra:title": string;
+  "hydra:description": string;
+  type: string;
+  title: string;
 }
