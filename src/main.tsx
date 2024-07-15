@@ -1,9 +1,16 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { BrowserRouter } from "react-router-dom";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
-import { ChakraProvider, extendTheme } from "@chakra-ui/react";
+import {
+  ChakraProvider,
+  extendTheme,
+  StyleFunctionProps,
+} from "@chakra-ui/react";
+import { mode } from "@chakra-ui/theme-tools";
 import App from "./App.tsx";
+import { InboxPage } from "./pages/inbox/inbox.tsx";
+import { AccountProvider } from "./data/context/account-provider.tsx";
 
 const client = new QueryClient({
   defaultOptions: {
@@ -15,11 +22,18 @@ const client = new QueryClient({
 
 const theme = extendTheme({
   styles: {
-    global: {
+    global: (props: Record<string, any> | StyleFunctionProps) => ({
       body: {
         fontFamily: "sans-serif",
       },
-    },
+      "*::placeholder": {
+        color: mode("gray.400", "whiteAlpha.400")(props),
+      },
+      "*, *::before, &::after": {
+        borderColor: mode("gray.200", "whiteAlpha.300")(props),
+        wordWrap: "break-word",
+      },
+    }),
   },
   config: {
     initialColorMode: "dark",
@@ -32,7 +46,13 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     <BrowserRouter>
       <QueryClientProvider client={client}>
         <ChakraProvider theme={theme}>
-          <App />
+          <AccountProvider>
+            <Routes>
+              <Route path="/" element={<App />}>
+                <Route index element={<InboxPage />} />
+              </Route>
+            </Routes>
+          </AccountProvider>
         </ChakraProvider>
       </QueryClientProvider>
     </BrowserRouter>
