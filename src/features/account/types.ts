@@ -20,8 +20,8 @@ export interface RemoveAccountDialogProps {
   isOpen: boolean;
 }
 
-// move to data types
 export interface Domain {
+  // remove this @ fields
   "@context": string;
   "@id": string;
   "@type": string;
@@ -63,4 +63,9 @@ export interface ErrorResponse {
 
 export interface AccountTokenType {
   jwt: string;
+}
+
+export interface LoginAccountFields
+  extends Pick<CreateAccountFields, "password"> {
+  email: string;
 }
