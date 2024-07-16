@@ -31,6 +31,10 @@ export function RemoveAccountDialog({
     LocalStorageKeys.ACCOUNTS,
     []
   );
+  const [, , removeLocalAccount] = useLocalStorage<Account[]>(
+    LocalStorageKeys.ACCOUNT,
+    []
+  );
 
   const account = useAccount();
 
@@ -49,6 +53,8 @@ export function RemoveAccountDialog({
         setAccounts((prev) => {
           return prev.filter((accountItem) => accountItem.id !== account?.id);
         });
+
+        removeLocalAccount();
 
         // create a random account and set new account on dispatch
       },
