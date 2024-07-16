@@ -55,8 +55,6 @@ export function RemoveAccountDialog({
         });
 
         removeLocalAccount();
-
-        // create a random account and set new account on dispatch
       },
       onError: () => {
         toast({

@@ -67,8 +67,6 @@ export function AccountProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!account && domain?.["hydra:totalItems"] && !isLoadingDomain) {
-      // first access, we need to create a random account
-
       // get random time id
       const generatedName = Date.now().toString(16);
       // remove numbers
@@ -81,6 +79,8 @@ export function AccountProvider({ children }: { children: ReactNode }) {
         password: Date.now().toString(16),
       };
 
+      // first access, we need to create a random account
+      // when delete the current account, create a new one
       createAccount(accountData);
     }
   }, [account, domain, isLoadingDomain]);
