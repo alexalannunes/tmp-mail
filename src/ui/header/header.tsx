@@ -14,6 +14,7 @@ import {
   SlideFade,
   Spinner,
   Text,
+  Tooltip,
   useClipboard,
   useColorMode,
   useDisclosure,
@@ -31,12 +32,30 @@ import { CreateAccountDialog } from "../../features/account/create-account";
 import { RemoveAccountDialog } from "../../features/account/remove-account";
 import { LocalStorageKeys } from "../../storage/keys";
 import { useGetMe } from "../../hooks/account/use-get-me";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useGetToken } from "../../hooks/account/use-get-token";
 import { AccountTokenType } from "../../features/account/types";
+import { LoginAccountDialog } from "../../features/account/login-account";
 
 // we set a created email if no email was created
 const email = "loading@email.com";
+
+function SelectableText({ text }: { text: string }) {
+  const textRef = useRef<HTMLParagraphElement>(null);
+  const handleSelectText = () => {
+    if (textRef.current) {
+      const range = document.createRange();
+      range.selectNode(textRef.current);
+      window.getSelection()?.removeAllRanges();
+      window.getSelection()?.addRange(range);
+    }
+  };
+  return (
+    <Text cursor={"pointer"} onClick={handleSelectText} ref={textRef}>
+      {text}
+    </Text>
+  );
+}
 
 function HeaderCurrentMail() {
   const account = useAccount();
@@ -44,9 +63,14 @@ function HeaderCurrentMail() {
   const { onCopy, hasCopied } = useClipboard(account?.address || "");
   return (
     <Flex alignItems={"center"} gap={2}>
-      <Button variant={"ghost"} size={"sm"} onClick={onCopy}>
-        {account?.address ?? email}
-      </Button>
+      <Tooltip
+        placement="bottom"
+        label="Your temporary email address, click to copy"
+      >
+        <Button variant={"ghost"} size={"sm"} onClick={onCopy}>
+          {account?.address ?? email}
+        </Button>
+      </Tooltip>
       <SlideFade offsetX={-20} offsetY={0} in={hasCopied}>
         <Icon as={FaCheck} color={"green.500"} _dark={{ color: "green.400" }} />
       </SlideFade>
@@ -57,17 +81,27 @@ function HeaderCurrentMail() {
 export function Header() {
   const { toggleColorMode, colorMode } = useColorMode();
 
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const {
+    isOpen: isCreateAccountOpen,
+    onOpen: onCreateAccountOpen,
+    onClose: onCreateAccountClose,
+  } = useDisclosure();
+
+  const {
+    isOpen: isRemoveAccountOpen,
+    onOpen: onRemoveAccountOpen,
+    onClose: onRemoveAccountClose,
+  } = useDisclosure();
+
+  const {
+    isOpen: isLoginAccountOpen,
+    onOpen: onLoginAccountOpen,
+    onClose: onLoginAccountClose,
+  } = useDisclosure();
 
   const [selectedAccount, setSelectedAccount] = useState<Account | null>(null);
 
   const account = useAccount();
-
-  const {
-    isOpen: isOpenDialog,
-    onOpen: openDialog,
-    onClose: closeDialog,
-  } = useDisclosure();
 
   const accounts = useReadLocalStorage<Account[]>(LocalStorageKeys.ACCOUNTS);
 
@@ -166,13 +200,14 @@ export function Header() {
             </MenuButton>
             <MenuList maxW={260}>
               <Box p={3} tabIndex={-1}>
-                <Text color={"gray.400"}>You are signed in as</Text>
-                <Text noOfLines={1} cursor={"pointer"}>
-                  {/* should select onClick */}
-                  {account?.address}
+                <Text color={"gray.400"} fontSize={"small"}>
+                  You are signed in as:
                 </Text>
+                <SelectableText text={account?.address || ""} />
                 <HStack>
-                  <Text color={"gray.400"}>Password:</Text>
+                  <Text color={"gray.400"} fontSize={"14px"}>
+                    Password:
+                  </Text>
                   <Text>{account?.password}</Text>
                 </HStack>
               </Box>
@@ -200,14 +235,20 @@ export function Header() {
 
               {/* add divider when has account */}
               <Divider />
-              <MenuItem onClick={onOpen}>
+              <MenuItem onClick={onCreateAccountOpen}>
                 <Box w={10}>
                   <FaUser />
                 </Box>
                 Create an account
               </MenuItem>
+              <MenuItem onClick={onLoginAccountOpen}>
+                <Box w={10}>
+                  <FaUser />
+                </Box>
+                Login
+              </MenuItem>
               <MenuItem
-                onClick={openDialog}
+                onClick={onRemoveAccountOpen}
                 _hover={{
                   color: "red.400",
                 }}
@@ -222,9 +263,20 @@ export function Header() {
         </HStack>
       </Flex>
 
-      <CreateAccountDialog onClose={onClose} isOpen={isOpen} />
+      <CreateAccountDialog
+        isOpen={isCreateAccountOpen}
+        onClose={onCreateAccountClose}
+      />
 
-      <RemoveAccountDialog isOpen={isOpenDialog} onClose={closeDialog} />
+      <LoginAccountDialog
+        isOpen={isLoginAccountOpen}
+        onClose={onLoginAccountClose}
+      />
+
+      <RemoveAccountDialog
+        isOpen={isRemoveAccountOpen}
+        onClose={onRemoveAccountClose}
+      />
     </>
   );
 }
