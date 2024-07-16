@@ -12,22 +12,33 @@ import {
   MenuItem,
   MenuList,
   SlideFade,
+  Spinner,
   Text,
   useClipboard,
   useColorMode,
   useDisclosure,
+  useToast,
 } from "@chakra-ui/react";
-import { useRef } from "react";
 import { FaMoon, FaSun, FaTrash, FaUser } from "react-icons/fa";
 import { FaCheck } from "react-icons/fa6";
+import { useLocalStorage, useReadLocalStorage } from "usehooks-ts";
 import {
+  Account,
   useAccount,
   useAccountDispatch,
 } from "../../data/context/account-context";
 import { CreateAccountDialog } from "../../features/account/create-account";
 import { RemoveAccountDialog } from "../../features/account/remove-account";
+import { LocalStorageKeys } from "../../storage/keys";
+import { useGetMe } from "../../hooks/account/use-get-me";
+import { useState } from "react";
+import { useGetToken } from "../../hooks/account/use-get-token";
+import { AccountTokenType } from "../../features/account/types";
 
-function HeaderCurrentMail({ email }: { email: string }) {
+// we set a created email if no email was created
+const email = "loading@email.com";
+
+function HeaderCurrentMail() {
   const account = useAccount();
 
   const { onCopy, hasCopied } = useClipboard(email);
@@ -48,16 +59,71 @@ export function Header() {
 
   const { isOpen, onOpen, onClose } = useDisclosure();
 
+  const [selectedAccount, setSelectedAccount] = useState<Account | null>(null);
+
+  const account = useAccount();
+
   const {
     isOpen: isOpenDialog,
     onOpen: openDialog,
     onClose: closeDialog,
   } = useDisclosure();
-  const cancelRef = useRef<HTMLButtonElement>(null);
+
+  const accounts = useReadLocalStorage<Account[]>(LocalStorageKeys.ACCOUNTS);
+
+  const [, setAccount] = useLocalStorage<Account | undefined>(
+    LocalStorageKeys.ACCOUNT,
+    undefined
+  );
+
+  const [, setAccountToken] = useLocalStorage<AccountTokenType>(
+    LocalStorageKeys.TOKEN,
+    { jwt: "" }
+  );
 
   const iconTheme = colorMode === "dark" ? <FaSun /> : <FaMoon />;
 
   const dispatch = useAccountDispatch();
+
+  const toast = useToast();
+
+  const { isLoadingAccountInfo, getAccountInfo } = useGetMe({
+    // warning: coupling
+    toast,
+    onSuccess: (data) => {
+      if (selectedAccount) {
+        const accountData = {
+          ...data,
+          password: selectedAccount.password,
+        };
+
+        // set current account after crated
+        setAccount(accountData);
+
+        dispatch(accountData);
+        // *********** this block can be in another creation hook
+      }
+    },
+  });
+
+  // re-use this function to login
+  const { isLoadingGetToken, getToken } = useGetToken({
+    toast,
+    onSuccess: (data) => {
+      setAccountToken({
+        jwt: data.token,
+      });
+      getAccountInfo();
+    },
+  });
+
+  const handleSelectAccount = (account: Account) => {
+    setSelectedAccount(account);
+    getToken({
+      address: account.address,
+      password: account.password,
+    });
+  };
 
   return (
     <>
@@ -73,7 +139,7 @@ export function Header() {
         }}
         justifyContent={"space-between"}
       >
-        <HeaderCurrentMail email="alexalannunes@gmail.com" />
+        <HeaderCurrentMail />
 
         <HStack>
           <IconButton
@@ -94,13 +160,7 @@ export function Header() {
               variant={"ghost"}
               rounded={"full"}
               aria-label="Menu accounts"
-              icon={
-                <Avatar
-                  size={"sm"}
-                  name="Dan Abrahmov"
-                  src="https://github.com/alexalannunes.png"
-                />
-              }
+              icon={<Avatar size={"sm"} name={account?.address} />}
             >
               Actions
             </MenuButton>
@@ -109,7 +169,7 @@ export function Header() {
                 <Text color={"gray.400"}>You are signed in as</Text>
                 <Text noOfLines={1} cursor={"pointer"}>
                   {/* should select onClick */}
-                  pusquenaocrikmslkwmlkswa@maxamba.com
+                  {account?.address}
                 </Text>
                 <HStack>
                   <Text color={"gray.400"}>Password:</Text>
@@ -118,42 +178,25 @@ export function Header() {
               </Box>
               <Divider />
 
-              <MenuItem
-                mb={2}
-                onClick={() => {
-                  dispatch({
-                    "@context": "m",
-                    "@id": "lee",
-                    "@type": "kjd",
-                    address: "alexalannunes@io.cm",
-                    createdAt: "kkd",
-                    id: "3283378378782",
-                    isDeleted: false,
-                    isDisabled: false,
-                    retentionAt: "ldd",
-                    updatedAt: "jdjkdjkd",
-                  });
-                }}
-              >
-                <Box w={10}>
-                  <Avatar size={"xs"} name="Alex Nunes" />
-                </Box>
-                <Text noOfLines={1}>alexalannunes@gmail.com</Text>
-              </MenuItem>
-
-              <MenuItem mb={2}>
-                <Box w={10}>
-                  <Avatar size={"xs"} name="Bale Sigas" />
-                </Box>
-                <Text noOfLines={1}>lkfmrklrkltl@gmail.com</Text>
-              </MenuItem>
-
-              <MenuItem mb={2}>
-                <Box w={10}>
-                  <Avatar size={"xs"} name="Mohamdn A" />
-                </Box>
-                <Text noOfLines={1}>dewfrlkemfrekl@gmail.com</Text>
-              </MenuItem>
+              {accounts?.map((account) => (
+                <MenuItem
+                  key={account.id}
+                  mb={2}
+                  onClick={() => {
+                    handleSelectAccount(account);
+                  }}
+                >
+                  <Box mr={2}>
+                    {account.id === selectedAccount?.id &&
+                    (isLoadingGetToken || isLoadingAccountInfo) ? (
+                      <Spinner size={"sm"} />
+                    ) : (
+                      <Avatar size={"xs"} name={account.address} />
+                    )}
+                  </Box>
+                  <Text noOfLines={1}>{account.address}</Text>
+                </MenuItem>
+              ))}
 
               {/* add divider when has account */}
               <Divider />
@@ -179,22 +222,9 @@ export function Header() {
         </HStack>
       </Flex>
 
-      <CreateAccountDialog
-        onClose={onClose}
-        isOpen={isOpen}
-        // onOk={(data) => {
-        //   console.log(data);
-        // }}
-      />
+      <CreateAccountDialog onClose={onClose} isOpen={isOpen} />
 
-      <RemoveAccountDialog
-        isOpen={isOpenDialog}
-        onClose={closeDialog}
-        cancelRef={cancelRef}
-        onOk={() => {
-          console.log("remove");
-        }}
-      />
+      <RemoveAccountDialog isOpen={isOpenDialog} onClose={closeDialog} />
     </>
   );
 }

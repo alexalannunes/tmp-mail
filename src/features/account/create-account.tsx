@@ -19,57 +19,46 @@ import {
   useBoolean,
   useToast,
 } from "@chakra-ui/react";
-import { useMutation } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { AxiosError } from "axios";
+import { useLocalStorage } from "usehooks-ts";
 import {
   Account,
   useAccountDispatch,
 } from "../../data/context/account-context";
-import { api } from "../../infra/http";
+import { useCreateAccount } from "../../hooks/account/use-create-account";
+import { useGetMe } from "../../hooks/account/use-get-me";
+import { useGetToken } from "../../hooks/account/use-get-token";
 import { LocalStorageKeys } from "../../storage/keys";
 import { DomainField } from "./domain-field";
 import {
+  AccountTokenType,
   CreateAccountDialogProps,
   CreateAccountFields,
   CreateAccountRequest,
-  ErrorResponse,
-  GetTokenResponse,
 } from "./types";
 import { useGetDomains } from "./use-get-domains";
-
-// TODO: map http errors code
-async function createAccountFetch(
-  params: CreateAccountRequest
-): Promise<Account> {
-  const request = await api.post("/accounts", params);
-  return request.data;
-}
-
-async function getAccountTokenFetch(
-  params: CreateAccountRequest
-): Promise<GetTokenResponse> {
-  const request = await api.post("/token", params);
-  return request.data;
-}
-
-async function getAccountInfoFetch(token: string): Promise<Account> {
-  // create api instance with authorization token and remove token params
-  const request = await api.get("/me", {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-  return request.data;
-}
 
 export function CreateAccountDialog({
   isOpen,
   onClose,
 }: CreateAccountDialogProps) {
   const methods = useForm<CreateAccountFields>();
+
+  const [, setAccounts] = useLocalStorage<Account[]>(
+    LocalStorageKeys.ACCOUNTS,
+    []
+  );
+  const [, setAccount] = useLocalStorage<Account | undefined>(
+    LocalStorageKeys.ACCOUNT,
+    undefined
+  );
+
+  const [, setAccountToken] = useLocalStorage<AccountTokenType>(
+    LocalStorageKeys.TOKEN,
+    { jwt: "" }
+  );
 
   const dispatch = useAccountDispatch();
 
@@ -80,6 +69,7 @@ export function CreateAccountDialog({
     control,
     setValue,
     watch,
+    getValues,
     formState: { errors, isValid },
   } = methods;
 
@@ -95,56 +85,50 @@ export function CreateAccountDialog({
 
   const toast = useToast();
 
-  const { isPending: isLoadingAccountInfo, mutate: getAccountInfo } =
-    useMutation<Account, AxiosError<ErrorResponse>, string>({
-      mutationKey: ["account-info"],
-      mutationFn: getAccountInfoFetch,
-      onSuccess: (data) => {
-        // user can create multiple accounts
-        localStorage.setItem(LocalStorageKeys.ACCOUNT, JSON.stringify(data));
-        dispatch(data);
-      },
-      onError: (error) => {
-        toast({
-          title: error.response?.data.detail,
-          isClosable: true,
-        });
-      },
-    });
-
-  const { isPending: isLoadingGetToken, mutate: getToken } = useMutation<
-    GetTokenResponse,
-    AxiosError<ErrorResponse>,
-    CreateAccountRequest
-  >({
-    mutationKey: ["account-token"],
-    mutationFn: getAccountTokenFetch,
+  const { isLoadingAccountInfo, getAccountInfo } = useGetMe({
+    // warning: coupling
+    toast,
     onSuccess: (data) => {
-      localStorage.setItem(LocalStorageKeys.TOKEN, data.token);
-      getAccountInfo(data.token);
-    },
-    onError: (error) => {
-      toast({
-        title: error.response?.data.detail,
-        isClosable: true,
-      });
+      // *********** this block can be in another creation hook
+      const accountData = {
+        ...data,
+        password: getValues("password"),
+      };
+
+      // set current account after crated
+      setAccount(accountData);
+      // store account to accounts array
+
+      setAccounts((prev) => [...prev, accountData]);
+      dispatch(accountData);
+      // *********** this block can be in another creation hook
+
+      reset();
+
+      // reset field
+      if (domains?.["hydra:member"]) {
+        setValue("domain", domains?.["hydra:member"]?.[0]?.domain);
+      }
+
+      onClose();
     },
   });
 
-  const { isPending: isLoadingCreateAccount, mutate: createAccount } =
-    useMutation<Account, AxiosError<ErrorResponse>, CreateAccountRequest>({
-      mutationKey: ["create-account"],
-      mutationFn: createAccountFetch,
-      onSuccess: (_, variables) => {
-        getToken(variables);
-      },
-      onError: (error) => {
-        toast({
-          title: error.response?.data.detail,
-          isClosable: true,
-        });
-      },
-    });
+  // re-use this function to login
+  const { isLoadingGetToken, getToken } = useGetToken({
+    toast,
+    onSuccess: (data) => {
+      setAccountToken({
+        jwt: data.token,
+      });
+      getAccountInfo();
+    },
+  });
+
+  const { isLoadingCreateAccount, createAccount } = useCreateAccount({
+    toast,
+    onSuccess: (_, variables) => getToken(variables),
+  });
 
   const submit = (data: CreateAccountFields) => {
     const accountData: CreateAccountRequest = {
@@ -153,15 +137,6 @@ export function CreateAccountDialog({
     };
 
     createAccount(accountData);
-
-    reset();
-
-    // reset field
-    if (domains?.["hydra:member"]) {
-      setValue("domain", domains?.["hydra:member"]?.[0]?.domain);
-    }
-
-    // onOk(data);
   };
 
   const hasErrors = !!Object.keys(errors).length;
@@ -175,6 +150,10 @@ export function CreateAccountDialog({
       setDomainWidth(domainFieldRef.current.clientWidth + 8);
     }
   }, [domain]);
+
+  const isLoading =
+    isLoadingCreateAccount || isLoadingGetToken || isLoadingAccountInfo;
+  const isDisabled = isLoading;
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size={"lg"}>
@@ -237,18 +216,19 @@ export function CreateAccountDialog({
         </ModalBody>
 
         <ModalFooter>
-          <Button variant={"ghost"} mr={3} onClick={onClose}>
+          <Button
+            variant={"ghost"}
+            mr={3}
+            onClick={onClose}
+            isDisabled={isDisabled}
+          >
             Cancel
           </Button>
           <Button
             type="submit"
             form="create-new-account"
             isDisabled={disabled}
-            isLoading={
-              isLoadingCreateAccount ||
-              isLoadingGetToken ||
-              isLoadingAccountInfo
-            }
+            isLoading={isLoading}
           >
             Create account
           </Button>

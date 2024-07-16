@@ -10,6 +10,7 @@ export interface Account {
   createdAt: string;
   updatedAt: string;
   retentionAt: string;
+  password: string;
 }
 
 type AccountDispatchFn = (newAccount: Account) => void;

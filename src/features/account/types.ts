@@ -1,4 +1,3 @@
-import { RefObject } from "react";
 export interface DomainFieldProps {
   onChange: (value: string) => void;
   value: string;
@@ -17,10 +16,8 @@ export interface CreateAccountDialogProps {
 }
 
 export interface RemoveAccountDialogProps {
-  onOk: () => void;
   onClose: () => void;
   isOpen: boolean;
-  cancelRef: RefObject<HTMLButtonElement>;
 }
 
 // move to data types
@@ -61,4 +58,9 @@ export interface ErrorResponse {
   "hydra:description": string;
   type: string;
   title: string;
+  message?: string;
+}
+
+export interface AccountTokenType {
+  jwt: string;
 }
