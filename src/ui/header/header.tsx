@@ -41,7 +41,7 @@ const email = "loading@email.com";
 function HeaderCurrentMail() {
   const account = useAccount();
 
-  const { onCopy, hasCopied } = useClipboard(email);
+  const { onCopy, hasCopied } = useClipboard(account?.address || "");
   return (
     <Flex alignItems={"center"} gap={2}>
       <Button variant={"ghost"} size={"sm"} onClick={onCopy}>
@@ -173,7 +173,7 @@ export function Header() {
                 </Text>
                 <HStack>
                   <Text color={"gray.400"}>Password:</Text>
-                  <Text>alexbabyocara</Text>
+                  <Text>{account?.password}</Text>
                 </HStack>
               </Box>
               <Divider />
