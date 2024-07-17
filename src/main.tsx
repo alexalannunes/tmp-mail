@@ -11,6 +11,7 @@ import { mode } from "@chakra-ui/theme-tools";
 import App from "./App.tsx";
 import { InboxPage } from "./pages/inbox/inbox.tsx";
 import { AccountProvider } from "./data/context/account-provider.tsx";
+import { MessagePage } from "./pages/message/message.tsx";
 
 const client = new QueryClient({
   defaultOptions: {
@@ -50,6 +51,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
             <Routes>
               <Route path="/" element={<App />}>
                 <Route index element={<InboxPage />} />
+                <Route path="/message/:messageId" element={<MessagePage />} />
               </Route>
             </Routes>
           </AccountProvider>

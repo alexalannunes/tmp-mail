@@ -8,7 +8,13 @@ function App() {
       <Aside />
       <Flex flexDirection={"column"} flex={1}>
         <Header />
-        <Box flex={1}>
+        <Box
+          flex={1}
+          bg="gray.100"
+          _dark={{
+            bg: "gray.800",
+          }}
+        >
           <Outlet />
         </Box>
       </Flex>
