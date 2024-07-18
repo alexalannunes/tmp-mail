@@ -1,5 +1,6 @@
 export enum LocalStorageKeys {
-  ACCOUNTS = "accounts",
-  ACCOUNT = "account",
-  TOKEN = "token",
+  ACCOUNTS = "tmp.accounts",
+  ACCOUNT = "tmp.account",
+  TOKEN = "tmp.token",
+  READ = "tmp.read-messages",
 }

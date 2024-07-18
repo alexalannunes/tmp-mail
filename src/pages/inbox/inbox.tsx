@@ -11,13 +11,15 @@ import {
   Text,
   useMediaQuery,
 } from "@chakra-ui/react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { formatDistance } from "date-fns";
 import { FaChevronRight } from "react-icons/fa";
 import { MdMail } from "react-icons/md";
 import { Link } from "react-router-dom";
+import { useLocalStorage } from "usehooks-ts";
 import { loggedApi } from "../../infra/http";
 import { Message } from "../../mock/messages";
+import { LocalStorageKeys } from "../../storage/keys";
 
 export function InboxPage() {
   const { data, isPending } = useQuery<Message>({
@@ -29,20 +31,34 @@ export function InboxPage() {
     },
   });
 
+  const [readMessages, setReadMessages] = useLocalStorage<string[]>(
+    LocalStorageKeys.READ,
+    []
+  );
+
   const [isLg] = useMediaQuery("(min-width: 1020px)");
 
-  const { mutate: seenMessage } = useMutation({
-    mutationKey: ["message-seen"],
-    mutationFn: async (messageId: string) => {
-      const req = await loggedApi.patch(`/messages/${messageId}`);
-      return req.data;
-    },
-    gcTime: 0,
-  });
+  // const { mutate: seenMessage } = useMutation({
+  //   mutationKey: ["message-seen"],
+  //   mutationFn: async (messageId: string) => {
+  //     // problem with patch route: invalid content-type
+  //     // sent an email to support
+  //     // const req = await loggedApi.patch(`/messages/${messageId}`);
+  //     // return req.data;
+  //   },
+  //   gcTime: 0,
+  // });
 
   const handleSeenMessage = (messageId: string) => {
     // possible event tracking here
-    seenMessage(messageId);
+
+    setReadMessages((prev) => {
+      if (prev.includes(messageId)) return prev;
+
+      return [...prev, messageId];
+    });
+    // mutation
+    // seenMessage(messageId);
   };
 
   function renderLoadingContent() {
@@ -100,9 +116,12 @@ export function InboxPage() {
                 <Box w={"600px"}>
                   <HStack>
                     <Avatar name={message.from.name || message.from.address}>
-                      {!message.seen && (
-                        <AvatarBadge boxSize={"1.2rem"} bg={"blue.300"} />
-                      )}
+                      {
+                        // !message.seen
+                        !readMessages.includes(message.id) && (
+                          <AvatarBadge boxSize={"1.2rem"} bg={"blue.300"} />
+                        )
+                      }
                     </Avatar>
                     <Stack spacing={0}>
                       <Text color={"cyan.500"} fontWeight={"semibold"}>
