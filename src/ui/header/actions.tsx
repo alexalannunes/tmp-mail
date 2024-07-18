@@ -15,35 +15,34 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { ReactNode, useState } from "react";
-import { FaMoon, FaSun } from "react-icons/fa";
 import { IconType } from "react-icons";
+import { FaMoon, FaSun } from "react-icons/fa";
 import { MdDelete, MdPerson, MdPersonAddAlt1 } from "react-icons/md";
+import { useLocalStorage, useReadLocalStorage } from "usehooks-ts";
 import {
   Account,
   useAccount,
   useAccountDispatch,
 } from "../../data/context/account-context";
-import { SelectableText } from "./selectable-text";
-import { useLocalStorage, useReadLocalStorage } from "usehooks-ts";
-import { LocalStorageKeys } from "../../storage/keys";
-import { useGetToken } from "../../hooks/account/use-get-token";
-import { useGetMe } from "../../hooks/account/use-get-me";
 import { AccountTokenType } from "../../features/account/types";
+import { useGetMe } from "../../hooks/account/use-get-me";
+import { useGetToken } from "../../hooks/account/use-get-token";
+import { LocalStorageKeys } from "../../storage/keys";
+import { SelectableText } from "./selectable-text";
 
 function MenuItemContent({ icon, label }: { icon: IconType; label: string }) {
   return (
-    <>
-      <Box w={10}>
-        <Icon
-          as={icon}
-          color={"gray.400"}
-          _dark={{
-            color: "gray.500",
-          }}
-        />
-      </Box>
-      {label}
-    </>
+    <HStack spacing={4} alignItems={"center"}>
+      <Icon
+        as={icon}
+        color={"gray.400"}
+        _dark={{
+          color: "gray.500",
+        }}
+        fontSize={"1.1rem"}
+      />
+      <Text>{label}</Text>
+    </HStack>
   );
 }
 
