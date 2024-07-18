@@ -11,7 +11,11 @@ import {
   Text,
   useMediaQuery,
 } from "@chakra-ui/react";
-import { useQuery } from "@tanstack/react-query";
+import {
+  QueryObserverResult,
+  RefetchOptions,
+  useQuery,
+} from "@tanstack/react-query";
 import { formatDistance } from "date-fns";
 import { FaChevronRight } from "react-icons/fa";
 import { MdMail } from "react-icons/md";
@@ -21,8 +25,22 @@ import { loggedApi } from "../../infra/http";
 import { Message } from "../../mock/messages";
 import { LocalStorageKeys } from "../../storage/keys";
 
-export function InboxPage() {
-  const { data, isPending } = useQuery<Message>({
+interface UseMessages {
+  messages: Message | undefined;
+  isPending: boolean;
+  isRefetching: boolean;
+  refetch: (
+    options?: RefetchOptions | undefined
+  ) => Promise<QueryObserverResult<Message, Error>>;
+}
+
+export function useMessages(): UseMessages {
+  const {
+    isPending,
+    isRefetching,
+    refetch,
+    data: messages,
+  } = useQuery<Message>({
     queryKey: ["messages"],
     queryFn: async () => {
       const req = await loggedApi.get("/messages");
@@ -30,6 +48,12 @@ export function InboxPage() {
       return data;
     },
   });
+
+  return { messages, isPending, isRefetching, refetch };
+}
+
+export function InboxPage() {
+  const { messages, isPending } = useMessages();
 
   const [readMessages, setReadMessages] = useLocalStorage<string[]>(
     LocalStorageKeys.READ,
@@ -62,6 +86,7 @@ export function InboxPage() {
   };
 
   function renderLoadingContent() {
+    // create skeleton
     return (
       <Flex
         w="full"
@@ -93,7 +118,7 @@ export function InboxPage() {
             },
           }}
         >
-          {data?.["hydra:member"].map((message) => (
+          {messages?.["hydra:member"].map((message) => (
             <Link
               key={message.id}
               to={`/message/${message.id}`}

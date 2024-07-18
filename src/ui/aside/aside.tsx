@@ -1,8 +1,11 @@
 import { Box, Button, Flex, Stack, Text } from "@chakra-ui/react";
-import { MdAllInbox } from "react-icons/md";
+import { MdAllInbox, MdRefresh } from "react-icons/md";
 import { Link } from "react-router-dom";
+import { useMessages } from "../../pages/inbox/inbox";
 
 export function Aside() {
+  const { isRefetching, refetch } = useMessages();
+
   return (
     <Box
       w="260px"
@@ -37,6 +40,16 @@ export function Aside() {
           to={"/"}
         >
           Inbox
+        </Button>
+
+        <Button
+          variant={"ghost"}
+          justifyContent={"flex-start"}
+          leftIcon={<MdRefresh />}
+          isLoading={isRefetching}
+          onClick={() => refetch()}
+        >
+          Refresh
         </Button>
       </Stack>
     </Box>
