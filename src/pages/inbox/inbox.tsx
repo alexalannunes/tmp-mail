@@ -11,7 +11,7 @@ import {
   Text,
   useMediaQuery,
 } from "@chakra-ui/react";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { formatDistance } from "date-fns";
 import { FaChevronRight } from "react-icons/fa";
 import { MdMail } from "react-icons/md";
@@ -30,6 +30,20 @@ export function InboxPage() {
   });
 
   const [isLg] = useMediaQuery("(min-width: 1020px)");
+
+  const { mutate: seenMessage } = useMutation({
+    mutationKey: ["message-seen"],
+    mutationFn: async (messageId: string) => {
+      const req = await loggedApi.patch(`/messages/${messageId}`);
+      return req.data;
+    },
+    gcTime: 0,
+  });
+
+  const handleSeenMessage = (messageId: string) => {
+    // possible event tracking here
+    seenMessage(messageId);
+  };
 
   function renderLoadingContent() {
     return (
@@ -64,7 +78,11 @@ export function InboxPage() {
           }}
         >
           {data?.["hydra:member"].map((message) => (
-            <Link key={message.id} to={`/message/${message.id}`}>
+            <Link
+              key={message.id}
+              to={`/message/${message.id}`}
+              onClick={() => handleSeenMessage(message.id)}
+            >
               <Flex
                 alignItems={"center"}
                 p={4}
