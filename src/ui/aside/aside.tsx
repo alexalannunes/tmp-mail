@@ -1,10 +1,21 @@
-import { Box, Button, Flex, Stack, Text } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Flex,
+  Stack,
+  Text,
+  useMediaQuery,
+} from "@chakra-ui/react";
 import { MdAllInbox, MdRefresh } from "react-icons/md";
 import { Link } from "react-router-dom";
 import { useMessages } from "../../pages/inbox/inbox";
 
 export function Aside() {
   const { isRefetching, refetch } = useMessages();
+
+  const [isMd] = useMediaQuery("(max-width: 768px)");
+
+  if (isMd) return <></>;
 
   return (
     <Box

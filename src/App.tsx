@@ -15,6 +15,7 @@ function App() {
           _dark={{
             bg: "gray.800",
           }}
+          w="100%"
         >
           <Outlet />
         </Box>
