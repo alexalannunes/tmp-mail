@@ -99,105 +99,123 @@ export function InboxPage() {
     );
   }
 
-  return (
-    <Box p={7}>
-      {isPending ? (
-        renderLoadingContent()
-      ) : (
-        <Stack
-          divider={<StackDivider />}
-          spacing={0}
-          sx={{
-            "& > a:first-of-type .message-container": {
-              borderTopLeftRadius: "md",
-              borderTopRightRadius: "md",
-            },
-            "& > a:last-of-type .message-container": {
-              borderBottomLeftRadius: "md",
-              borderBottomRightRadius: "md",
-            },
-          }}
-        >
-          {messages?.["hydra:member"].map((message) => (
-            <Link
-              key={message.id}
-              to={`/message/${message.id}`}
-              onClick={() => handleSeenMessage(message.id)}
+  function renderNoMessagesContent() {
+    return (
+      <Flex alignItems={"center"} justifyContent={"center"} height={"300px"}>
+        <Text>No messages yet :)</Text>
+      </Flex>
+    );
+  }
+
+  function renderMessagesContent() {
+    return (
+      <Stack
+        divider={<StackDivider />}
+        spacing={0}
+        sx={{
+          "& > a:first-of-type .message-container": {
+            borderTopLeftRadius: "md",
+            borderTopRightRadius: "md",
+          },
+          "& > a:last-of-type .message-container": {
+            borderBottomLeftRadius: "md",
+            borderBottomRightRadius: "md",
+          },
+        }}
+      >
+        {messages?.["hydra:member"].map((message) => (
+          <Link
+            key={message.id}
+            to={`/message/${message.id}`}
+            onClick={() => handleSeenMessage(message.id)}
+          >
+            <Flex
+              alignItems={"center"}
+              p={4}
+              bg="white"
+              _dark={{ bg: "gray.700" }}
+              _hover={{
+                bg: "gray.50",
+                _dark: {
+                  bg: "gray.600",
+                },
+              }}
+              className="message-container"
             >
-              <Flex
-                alignItems={"center"}
-                p={4}
-                bg="white"
-                _dark={{ bg: "gray.700" }}
-                _hover={{
-                  bg: "gray.50",
-                  _dark: {
-                    bg: "gray.600",
-                  },
-                }}
-                className="message-container"
-              >
-                <Box>
-                  <HStack>
-                    <Avatar name={message.from.name || message.from.address}>
-                      {
-                        // !message.seen
-                        !readMessages.includes(message.id) && (
-                          <AvatarBadge boxSize={"1.2rem"} bg={"blue.300"} />
-                        )
-                      }
-                    </Avatar>
-                    <Stack spacing={0}>
-                      <Text color={"cyan.500"} fontWeight={"semibold"}>
-                        {message.from.name}
-                      </Text>
-                      <HStack alignItems={"center"}>
-                        <Icon color={"gray.500"} as={MdMail} />
-                        <Text color={"gray.500"}>{message.from.address}</Text>
-                      </HStack>
-                    </Stack>
-                  </HStack>
-                </Box>
-                {/* useMediaQuery to hide when small screen */}
-                {isLg && (
-                  <Stack flex={1} spacing={0}>
-                    <Text
-                      color={"gray.800"}
-                      _dark={{
-                        color: "gray.400",
-                      }}
-                      noOfLines={1}
-                    >
-                      {message.subject}
+              <Box>
+                <HStack>
+                  <Avatar name={message.from.name || message.from.address}>
+                    {
+                      // !message.seen
+                      !readMessages.includes(message.id) && (
+                        <AvatarBadge boxSize={"1.2rem"} bg={"blue.300"} />
+                      )
+                    }
+                  </Avatar>
+                  <Stack spacing={0}>
+                    <Text color={"cyan.500"} fontWeight={"semibold"}>
+                      {message.from.name}
                     </Text>
-                    <Text
-                      color={"gray.800"}
-                      _dark={{
-                        color: "gray.400",
-                      }}
-                      fontSize={"small"}
-                    >
-                      {formatDistance(message.createdAt, new Date(), {
-                        addSuffix: true,
-                      })}
-                    </Text>
+                    <HStack alignItems={"center"}>
+                      <Icon color={"gray.500"} as={MdMail} />
+                      <Text color={"gray.500"}>{message.from.address}</Text>
+                    </HStack>
                   </Stack>
-                )}
-                {/* useMediaQuery to hide when small screen */}
-                {isLg && (
-                  <Flex
-                    alignItems={"center"}
-                    justifyContent={"flex-end"}
-                    w={"40"}
+                </HStack>
+              </Box>
+              {/* useMediaQuery to hide when small screen */}
+              {isLg && (
+                <Stack flex={1} spacing={0}>
+                  <Text
+                    color={"gray.800"}
+                    _dark={{
+                      color: "gray.400",
+                    }}
+                    noOfLines={1}
                   >
-                    <Icon as={FaChevronRight} />
-                  </Flex>
-                )}
-              </Flex>
-            </Link>
-          ))}
-        </Stack>
-      )}
-    </Box>
-  );
+                    {message.subject}
+                  </Text>
+                  <Text
+                    color={"gray.800"}
+                    _dark={{
+                      color: "gray.400",
+                    }}
+                    fontSize={"small"}
+                  >
+                    {formatDistance(message.createdAt, new Date(), {
+                      addSuffix: true,
+                    })}
+                  </Text>
+                </Stack>
+              )}
+              {/* useMediaQuery to hide when small screen */}
+              {isLg && (
+                <Flex
+                  alignItems={"center"}
+                  justifyContent={"flex-end"}
+                  w={"40"}
+                >
+                  <Icon as={FaChevronRight} />
+                </Flex>
+              )}
+            </Flex>
+          </Link>
+        ))}
+      </Stack>
+    );
+  }
+
+  function renderContent() {
+    if (isPending) {
+      return renderLoadingContent();
+    }
+
+    if (!isPending && !messages?.["hydra:member"].length) {
+      return renderNoMessagesContent();
+    }
+
+    return renderMessagesContent();
+  }
+
+  return <Box p={7}>{renderContent()}</Box>;
 }
