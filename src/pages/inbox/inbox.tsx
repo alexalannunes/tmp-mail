@@ -142,7 +142,7 @@ export function InboxPage() {
               }}
               className="message-container"
             >
-              <Box>
+              <Box w={isLg ? "600px" : "auto"}>
                 <HStack>
                   <Avatar name={message.from.name || message.from.address}>
                     {
