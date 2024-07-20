@@ -34,9 +34,9 @@ function App() {
             >
               Made with
             </Text>
-            <MdFavorite color="red" /> {/* setup vercel url */}
+            <MdFavorite color="red" />
             <Link
-              href="https://docs.mail.tm/?ref=tmp.mail.vercel.app"
+              href="https://docs.mail.tm/?ref=tmp-mail.vercel.app"
               target="_blank"
               color={"teal.500"}
               _dark={{
