@@ -5,7 +5,7 @@ import {
   AccountTokenType,
   CreateAccountRequest,
 } from "../../features/account/types";
-import { useGetDomains } from "../../features/account/use-get-domains";
+import { useGetDomains } from "../../hooks/account/use-get-domains";
 import { useCreateAccount } from "../../hooks/account/use-create-account";
 import { useGetMe } from "../../hooks/account/use-get-me";
 import { useGetToken } from "../../hooks/account/use-get-token";

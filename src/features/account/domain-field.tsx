@@ -10,7 +10,7 @@ import { useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { FaChevronDown } from "react-icons/fa";
 import { CreateAccountFields, DomainFieldProps } from "./types";
-import { useGetDomains } from "./use-get-domains";
+import { useGetDomains } from "../../hooks/account/use-get-domains";
 
 export function DomainField({ onChange, value }: DomainFieldProps) {
   const [localValue, setLocalValue] = useState(value);

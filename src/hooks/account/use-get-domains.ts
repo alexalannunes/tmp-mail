@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { api } from "../../infra/http";
-import { Domain } from "./types";
+import { Domain } from "../../features/account/types";
 
 async function fetchDomains(): Promise<Domain> {
   const req = await api.get<Domain>("/domains");

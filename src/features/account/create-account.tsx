@@ -38,7 +38,7 @@ import {
   CreateAccountFields,
   CreateAccountRequest,
 } from "./types";
-import { useGetDomains } from "./use-get-domains";
+import { useGetDomains } from "../../hooks/account/use-get-domains";
 import { useMessages } from "../../pages/inbox/inbox";
 
 export function CreateAccountDialog({
