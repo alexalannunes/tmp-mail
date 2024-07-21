@@ -24,6 +24,7 @@ import { useLocalStorage } from "usehooks-ts";
 import { loggedApi } from "../../infra/http";
 import { Message } from "../../mock/messages";
 import { LocalStorageKeys } from "../../storage/keys";
+import { useAccount } from "../../data/context/account-context";
 
 interface UseMessages {
   messages: Message | undefined;
@@ -35,6 +36,7 @@ interface UseMessages {
 }
 
 export function useMessages(): UseMessages {
+  const account = useAccount();
   const {
     isPending,
     isRefetching,
@@ -47,6 +49,7 @@ export function useMessages(): UseMessages {
       const data = req.data;
       return data;
     },
+    enabled: !!account?.id,
   });
 
   return { messages, isPending, isRefetching, refetch };
