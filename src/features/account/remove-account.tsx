@@ -1,19 +1,10 @@
-import {
-  AlertDialog,
-  AlertDialogBody,
-  AlertDialogContent,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogOverlay,
-  Button,
-  useToast,
-} from "@chakra-ui/react";
+import { useToast } from "@chakra-ui/react";
 import { useMutation } from "@tanstack/react-query";
-import { useRef } from "react";
 import { useLocalStorage } from "usehooks-ts";
 import { Account, useAccount } from "../../data/context/account-context";
 import { loggedApi } from "../../infra/http";
 import { LocalStorageKeys } from "../../storage/keys";
+import { DeleteModal } from "../../ui/components/modal-delete/modal-delete";
 import { RemoveAccountDialogProps } from "./types";
 
 async function removeAccountFetch(accountId: string): Promise<void> {
@@ -25,8 +16,6 @@ export function RemoveAccountDialog({
   onClose,
   isOpen,
 }: RemoveAccountDialogProps) {
-  const cancelRef = useRef<HTMLButtonElement>(null);
-
   const [, setAccounts] = useLocalStorage<Account[]>(
     LocalStorageKeys.ACCOUNTS,
     []
@@ -70,40 +59,12 @@ export function RemoveAccountDialog({
     }
   };
   return (
-    <AlertDialog
+    <DeleteModal
+      title="Delete account"
       isOpen={isOpen}
-      leastDestructiveRef={cancelRef}
       onClose={onClose}
-    >
-      <AlertDialogOverlay>
-        <AlertDialogContent>
-          <AlertDialogHeader fontSize="lg" fontWeight="bold">
-            Delete account
-          </AlertDialogHeader>
-
-          <AlertDialogBody>
-            Are you sure? You can't undo this action afterwards.
-          </AlertDialogBody>
-
-          <AlertDialogFooter>
-            <Button
-              ref={cancelRef}
-              onClick={onClose}
-              isDisabled={isLoadingRemoveAccount}
-            >
-              Cancel
-            </Button>
-            <Button
-              colorScheme="red"
-              onClick={handleOk}
-              ml={3}
-              isLoading={isLoadingRemoveAccount}
-            >
-              Delete
-            </Button>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialogOverlay>
-    </AlertDialog>
+      onOk={handleOk}
+      isLoading={isLoadingRemoveAccount}
+    />
   );
 }
