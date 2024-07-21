@@ -33,6 +33,7 @@ import {
   CreateAccountRequest,
   LoginAccountFields,
 } from "./types";
+import { useMessages } from "../../pages/inbox/inbox";
 
 export function LoginAccountDialog({
   isOpen,
@@ -64,6 +65,8 @@ export function LoginAccountDialog({
 
   const toast = useToast();
 
+  const { refetch } = useMessages();
+
   const { isLoadingAccountInfo, getAccountInfo } = useGetMe({
     // warning: coupling
     toast,
@@ -80,6 +83,8 @@ export function LoginAccountDialog({
 
       dispatch(accountData);
       // *********** this block can be in another creation hook
+
+      refetch();
 
       onClose();
       reset();

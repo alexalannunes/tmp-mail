@@ -39,6 +39,7 @@ import {
   CreateAccountRequest,
 } from "./types";
 import { useGetDomains } from "./use-get-domains";
+import { useMessages } from "../../pages/inbox/inbox";
 
 export function CreateAccountDialog({
   isOpen,
@@ -85,6 +86,8 @@ export function CreateAccountDialog({
 
   const toast = useToast();
 
+  const { refetch } = useMessages();
+
   const { isLoadingAccountInfo, getAccountInfo } = useGetMe({
     // warning: coupling
     toast,
@@ -109,6 +112,9 @@ export function CreateAccountDialog({
       if (domains?.["hydra:member"]) {
         setValue("domain", domains?.["hydra:member"]?.[0]?.domain);
       }
+
+      // refetch messages
+      refetch();
 
       onClose();
     },

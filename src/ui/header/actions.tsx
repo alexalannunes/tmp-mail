@@ -29,6 +29,7 @@ import { useGetMe } from "../../hooks/account/use-get-me";
 import { useGetToken } from "../../hooks/account/use-get-token";
 import { LocalStorageKeys } from "../../storage/keys";
 import { SelectableText } from "./selectable-text";
+import { useMessages } from "../../pages/inbox/inbox";
 
 function MenuItemContent({ icon, label }: { icon: IconType; label: string }) {
   return (
@@ -100,6 +101,8 @@ function MenuAccounts({
 
   const toast = useToast();
 
+  const { refetch } = useMessages();
+
   const { isLoadingAccountInfo, getAccountInfo } = useGetMe({
     // warning: coupling
     toast,
@@ -115,6 +118,9 @@ function MenuAccounts({
 
         dispatch(accountData);
         // *********** this block can be in another creation hook
+
+        // refetch messages
+        refetch();
       }
     },
   });
