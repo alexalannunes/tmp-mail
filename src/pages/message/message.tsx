@@ -11,10 +11,12 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { useQuery } from "@tanstack/react-query";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { MdDeleteOutline, MdOutlineMessage } from "react-icons/md";
 import { loggedApi } from "../../infra/http";
 import { MessageView } from "../../mock/messages";
+import { useLocalStorage } from "usehooks-ts";
+import { LocalStorageKeys } from "../../storage/keys";
 
 export function MessagePage() {
   const { messageId } = useParams();
@@ -34,6 +36,17 @@ export function MessagePage() {
     enabled: !!messageId,
   });
 
+  const navigate = useNavigate();
+  const [, setReadMessages] = useLocalStorage<string[]>(
+    LocalStorageKeys.READ,
+    []
+  );
+
+  const handleMarkAsUnread = () => {
+    setReadMessages((prev) => prev.filter((msgId) => msgId !== messageId));
+    navigate("/");
+  };
+
   const isLoading = isPending || isFetching;
 
   return (
@@ -48,6 +61,7 @@ export function MessagePage() {
             variant={"outline"}
             colorScheme="cyan"
             leftIcon={<MdOutlineMessage />}
+            onClick={handleMarkAsUnread}
           >
             Mark as unread
           </Button>
