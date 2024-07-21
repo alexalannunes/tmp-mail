@@ -13,7 +13,14 @@ import { InboxPage } from "./pages/inbox/inbox.tsx";
 import { AccountProvider } from "./data/context/account-provider.tsx";
 import { MessagePage } from "./pages/message/message.tsx";
 
-const client = new QueryClient();
+const client = new QueryClient({
+  defaultOptions: {
+    queries: {
+      // enable in prod mode
+      refetchOnWindowFocus: import.meta.env.PROD,
+    },
+  },
+});
 
 const theme = extendTheme({
   styles: {
