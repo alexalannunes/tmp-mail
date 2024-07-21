@@ -21,6 +21,7 @@ import { MessageView } from "../../mock/messages";
 import { LocalStorageKeys } from "../../storage/keys";
 import { DeleteModal } from "../../ui/components/modal-delete/modal-delete";
 import { useMessages } from "../inbox/inbox";
+import { usePageTitle } from "../../hooks/app/use-page-title";
 
 async function deleteMessageFetch(messageId: string): Promise<void> {
   const request = await loggedApi.delete(`/messages/${messageId}`);
@@ -79,6 +80,8 @@ export function MessagePage() {
         });
       },
     });
+
+  usePageTitle(message?.subject);
 
   const handleMarkAsUnread = () => {
     setReadMessages((prev) => prev.filter((msgId) => msgId !== messageId));

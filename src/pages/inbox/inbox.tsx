@@ -25,6 +25,7 @@ import { loggedApi } from "../../infra/http";
 import { Message } from "../../mock/messages";
 import { LocalStorageKeys } from "../../storage/keys";
 import { useAccount } from "../../data/context/account-context";
+import { usePageTitle } from "../../hooks/app/use-page-title";
 
 interface UseMessages {
   messages: Message | undefined;
@@ -62,6 +63,8 @@ export function InboxPage() {
     LocalStorageKeys.READ,
     []
   );
+
+  usePageTitle();
 
   const [isLg] = useMediaQuery("(min-width: 1020px)");
 
