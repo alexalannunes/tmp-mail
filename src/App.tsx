@@ -1,9 +1,9 @@
 import { Box, Flex, Link, Text } from "@chakra-ui/react";
-import { Outlet } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { MdFavorite } from "react-icons/md";
+import { Outlet } from "react-router-dom";
 import { Aside } from "./ui/aside/aside";
 import { Header } from "./ui/header/header";
-import { useTranslation } from "react-i18next";
 
 function Footer() {
   const { t } = useTranslation();

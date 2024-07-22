@@ -1,0 +1,23 @@
+{
+  "aside": {
+    "inbox": "Inbox",
+    "refresh": "Atualizar"
+  },
+  "header": {
+    "copy_email": "Seu email temporário, click para copiar",
+    "actions": {
+      "signed_in": "Você está logado como:",
+      "password": "Senha",
+      "create_account": "Criar uma conta",
+      "login": "Login",
+      "delete_account": "Deletar conta"
+    },
+    "language": {
+      "en": "Inglês",
+      "pt": "Português"
+    }
+  },
+  "footer": {
+    "made_with": "Feito com "
+  }
+}

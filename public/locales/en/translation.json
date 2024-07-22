@@ -11,6 +11,10 @@
       "create_account": "Create an account",
       "login": "Login",
       "delete_account": "Delete account"
+    },
+    "language": {
+      "en": "English",
+      "pt": "Portuguese"
     }
   },
   "footer": {

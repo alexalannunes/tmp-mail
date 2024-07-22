@@ -17,7 +17,12 @@ import {
 import { ReactNode, useState } from "react";
 import { IconType } from "react-icons";
 import { FaMoon, FaSun } from "react-icons/fa";
-import { MdDelete, MdPerson, MdPersonAddAlt1 } from "react-icons/md";
+import {
+  MdDelete,
+  MdPerson,
+  MdPersonAddAlt1,
+  MdTranslate,
+} from "react-icons/md";
 import { useLocalStorage, useReadLocalStorage } from "usehooks-ts";
 import { useTranslation } from "react-i18next";
 import {
@@ -31,6 +36,7 @@ import { useGetToken } from "../../hooks/account/use-get-token";
 import { LocalStorageKeys } from "../../storage/keys";
 import { SelectableText } from "./selectable-text";
 import { useMessages } from "../../pages/inbox/inbox";
+import { LanguageType, i18n } from "../../i18n";
 
 function MenuItemContent({ icon, label }: { icon: IconType; label: string }) {
   return (
@@ -217,5 +223,41 @@ function MenuAccounts({
   );
 }
 
+function MenuLanguages() {
+  const { t } = useTranslation();
+
+  const [, setLanguage] = useLocalStorage<LanguageType>(
+    LocalStorageKeys.LANGUAGE,
+    { lng: "en" }
+  );
+
+  const handleChangeLanguage = (lng: string) => {
+    setLanguage({ lng });
+    i18n.changeLanguage(lng);
+  };
+
+  return (
+    <Menu>
+      <MenuButton
+        as={IconButton}
+        variant={"ghost"}
+        rounded={"full"}
+        aria-label="Menu accounts"
+        icon={<MdTranslate />}
+      />
+      <MenuList>
+        {/* if we are using english, this item does not need to be display */}
+        <MenuItem onClick={() => handleChangeLanguage("en")}>
+          {t("header.language.en")}
+        </MenuItem>
+        <MenuItem onClick={() => handleChangeLanguage("pt")}>
+          {t("header.language.pt")}
+        </MenuItem>
+      </MenuList>
+    </Menu>
+  );
+}
+
+HeaderActions.MenuLanguages = MenuLanguages;
 HeaderActions.ToggleThemeButton = ToggleThemeButton;
 HeaderActions.MenuAccounts = MenuAccounts;

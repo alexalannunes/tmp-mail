@@ -42,6 +42,7 @@ export function Header() {
 
         <HeaderActions>
           <HeaderActions.ToggleThemeButton />
+          <HeaderActions.MenuLanguages />
           <HeaderActions.MenuAccounts
             onCreateAccountOpen={onCreateAccountOpen}
             onLoginAccountOpen={onLoginAccountOpen}
