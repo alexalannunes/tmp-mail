@@ -17,6 +17,10 @@
       "pt": "Português"
     }
   },
+  "message": {
+    "mark_as_unread": "Marcar como não lida",
+    "delete": "Remover"
+  },
   "footer": {
     "made_with": "Feito com "
   }

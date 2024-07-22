@@ -38,3 +38,9 @@ export interface MessageView {
   updatedAt: string;
   accountId: string;
 }
+
+export interface MessageViewActions {
+  isDeleteMessageOpen: boolean;
+  onDeleteMessageClose: () => void;
+  onDeleteMessageOpen: () => void;
+}
