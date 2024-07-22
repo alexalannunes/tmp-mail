@@ -16,16 +16,18 @@ import {
   RefetchOptions,
   useQuery,
 } from "@tanstack/react-query";
-import { formatDistance } from "date-fns";
+import { Locale, formatDistance } from "date-fns";
+import { enUS, ptBR } from "date-fns/locale";
 import { FaChevronRight } from "react-icons/fa";
 import { MdMail } from "react-icons/md";
 import { Link } from "react-router-dom";
 import { useLocalStorage } from "usehooks-ts";
+import { useAccount } from "../../data/context/account-context";
+import { usePageTitle } from "../../hooks/app/use-page-title";
+import { LanguageType } from "../../i18n";
 import { loggedApi } from "../../infra/http";
 import { Message } from "../../mock/messages";
 import { LocalStorageKeys } from "../../storage/keys";
-import { useAccount } from "../../data/context/account-context";
-import { usePageTitle } from "../../hooks/app/use-page-title";
 
 interface UseMessages {
   messages: Message | undefined;
@@ -67,6 +69,10 @@ export function InboxPage() {
   usePageTitle();
 
   const [isLg] = useMediaQuery("(min-width: 1020px)");
+
+  const [language] = useLocalStorage<LanguageType>(LocalStorageKeys.LANGUAGE, {
+    lng: "en",
+  });
 
   // const { mutate: seenMessage } = useMutation({
   //   mutationKey: ["message-seen"],
@@ -114,6 +120,12 @@ export function InboxPage() {
   }
 
   function renderMessagesContent() {
+    const localeMap: Record<string, Locale> = {
+      en: enUS,
+      pt: ptBR,
+    };
+    const locale = localeMap[language.lng];
+
     return (
       <Stack
         divider={<StackDivider />}
@@ -190,6 +202,7 @@ export function InboxPage() {
                   >
                     {formatDistance(message.createdAt, new Date(), {
                       addSuffix: true,
+                      locale,
                     })}
                   </Text>
                 </Stack>
