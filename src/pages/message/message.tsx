@@ -9,7 +9,6 @@ import {
 } from "./message-context";
 import { RemoveMessage } from "./remove-message";
 import { MessageTitle } from "./title";
-import { MessageView } from "./types";
 import { useMessage } from "./use-message";
 
 export function MessagePage() {
@@ -31,8 +30,7 @@ export function MessagePage() {
         onDeleteMessageOpen,
       }}
     >
-      {/* fix this */}
-      <MessageViewContext.Provider value={(message || {}) as MessageView}>
+      <MessageViewContext.Provider value={message}>
         <Box p={7}>
           <Flex alignItems={"center"} justifyContent={"space-between"}>
             <MessageTitle />

@@ -4,14 +4,14 @@ import { MessageView } from "./types";
 import { useQuery } from "@tanstack/react-query";
 
 export function useMessage(): {
-  message: MessageView | undefined;
+  message: MessageView;
   isLoadingMessage: boolean;
   isFetchingMessage: boolean;
 } {
   const { messageId } = useParams();
 
   const {
-    data: message,
+    data: message = {} as MessageView,
     isPending: isLoadingMessage,
     isFetching: isFetchingMessage,
   } = useQuery<MessageView>({
