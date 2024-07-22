@@ -156,6 +156,7 @@ function MenuAccounts({
   return (
     <Menu>
       <MenuButton
+        ml={1}
         as={IconButton}
         variant={"ghost"}
         rounded={"full"}
