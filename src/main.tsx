@@ -8,10 +8,23 @@ import {
   StyleFunctionProps,
 } from "@chakra-ui/react";
 import { mode } from "@chakra-ui/theme-tools";
+import i18n from "i18next";
+import { initReactI18next } from "react-i18next";
 import App from "./App.tsx";
 import { InboxPage } from "./pages/inbox/inbox.tsx";
 import { AccountProvider } from "./data/context/account-provider.tsx";
 import { MessagePage } from "./pages/message/message.tsx";
+import translationEn from "../public/locales/en/translation.json";
+
+i18n.use(initReactI18next).init({
+  resources: {
+    en: {
+      translation: translationEn,
+    },
+  },
+  lng: "en",
+  fallbackLng: "en",
+});
 
 const client = new QueryClient({
   defaultOptions: {

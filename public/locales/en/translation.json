@@ -1,0 +1,19 @@
+{
+  "aside": {
+    "inbox": "Inbox",
+    "refresh": "Refresh"
+  },
+  "header": {
+    "copy_email": "Your temporary email address, click to copy",
+    "actions": {
+      "signed_in": "You are signed in as:",
+      "password": "Password",
+      "create_account": "Create an account",
+      "login": "Login",
+      "delete_account": "Delete account"
+    }
+  },
+  "footer": {
+    "made_with": "Made with "
+  }
+}

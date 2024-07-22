@@ -19,6 +19,7 @@ import { IconType } from "react-icons";
 import { FaMoon, FaSun } from "react-icons/fa";
 import { MdDelete, MdPerson, MdPersonAddAlt1 } from "react-icons/md";
 import { useLocalStorage, useReadLocalStorage } from "usehooks-ts";
+import { useTranslation } from "react-i18next";
 import {
   Account,
   useAccount,
@@ -97,6 +98,8 @@ function MenuAccounts({
     { jwt: "" }
   );
 
+  const { t } = useTranslation();
+
   const dispatch = useAccountDispatch();
 
   const toast = useToast();
@@ -156,12 +159,12 @@ function MenuAccounts({
       <MenuList maxW={260}>
         <Box p={3} tabIndex={-1}>
           <Text color={"gray.400"} fontSize={"small"}>
-            You are signed in as:
+            {t("header.actions.signed_in")}
           </Text>
           <SelectableText text={account?.address || ""} />
           <HStack>
             <Text color={"gray.400"} fontSize={"14px"}>
-              Password:
+              {t("header.actions.password")}
             </Text>
             <Text>{account?.password}</Text>
           </HStack>
@@ -190,10 +193,13 @@ function MenuAccounts({
 
         <Divider />
         <MenuItem onClick={onCreateAccountOpen}>
-          <MenuItemContent icon={MdPersonAddAlt1} label={"Create an account"} />
+          <MenuItemContent
+            icon={MdPersonAddAlt1}
+            label={t("header.actions.create_account")}
+          />
         </MenuItem>
         <MenuItem onClick={onLoginAccountOpen}>
-          <MenuItemContent icon={MdPerson} label={"Login"} />
+          <MenuItemContent icon={MdPerson} label={t("header.actions.login")} />
         </MenuItem>
         <MenuItem
           onClick={onRemoveAccountOpen}
@@ -201,7 +207,10 @@ function MenuAccounts({
             color: "red.400",
           }}
         >
-          <MenuItemContent icon={MdDelete} label="Delete account" />
+          <MenuItemContent
+            icon={MdDelete}
+            label={t("header.actions.delete_account")}
+          />
         </MenuItem>
       </MenuList>
     </Menu>

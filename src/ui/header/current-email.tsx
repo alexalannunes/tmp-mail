@@ -10,6 +10,7 @@ import {
 import { FaCheck } from "react-icons/fa6";
 import { MdMailOutline } from "react-icons/md";
 import { useAccount } from "../../data/context/account-context";
+import { useTranslation } from "react-i18next";
 
 // we set a created email if no email was created
 const email = "loading@email.com";
@@ -20,6 +21,8 @@ export function HeaderCurrentMail() {
   const { colorMode } = useColorMode();
 
   const { onCopy, hasCopied } = useClipboard(account?.address || "");
+
+  const { t } = useTranslation();
 
   const getColorOnCopy = () => {
     if (colorMode === "dark") {
@@ -37,10 +40,7 @@ export function HeaderCurrentMail() {
   return (
     <Flex alignItems={"center"} gap={2}>
       <Icon as={MdMailOutline} color={colorOnCopy} />
-      <Tooltip
-        placement="bottom"
-        label="Your temporary email address, click to copy"
-      >
+      <Tooltip placement="bottom" label={t("header.copy_email")}>
         <Button
           variant={"ghost"}
           size={"sm"}

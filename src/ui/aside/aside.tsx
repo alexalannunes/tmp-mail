@@ -9,8 +9,10 @@ import {
 import { MdAllInbox, MdRefresh } from "react-icons/md";
 import { Link } from "react-router-dom";
 import { useMessages } from "../../pages/inbox/inbox";
+import { useTranslation } from "react-i18next";
 
 export function Aside() {
+  const { t } = useTranslation();
   const { isRefetching, refetch } = useMessages();
 
   const [isMd] = useMediaQuery("(max-width: 768px)");
@@ -50,7 +52,7 @@ export function Aside() {
           as={Link}
           to={"/"}
         >
-          Inbox
+          {t("aside.inbox")}
         </Button>
 
         <Button
@@ -60,7 +62,7 @@ export function Aside() {
           isLoading={isRefetching}
           onClick={() => refetch()}
         >
-          Refresh
+          {t("aside.refresh")}
         </Button>
       </Stack>
     </Box>
