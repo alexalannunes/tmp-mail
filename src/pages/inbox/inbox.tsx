@@ -26,7 +26,7 @@ import { useAccount } from "../../data/context/account-context";
 import { usePageTitle } from "../../hooks/app/use-page-title";
 import { LanguageType } from "../../i18n";
 import { loggedApi } from "../../infra/http";
-import { Message } from "../../mock/messages";
+import { Message } from "../../mock/messages-mock";
 import { LocalStorageKeys } from "../../storage/keys";
 
 interface UseMessages {

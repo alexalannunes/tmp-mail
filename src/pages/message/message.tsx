@@ -17,11 +17,11 @@ import { useNavigate, useParams } from "react-router-dom";
 import { MdDeleteOutline, MdOutlineMessage } from "react-icons/md";
 import { useLocalStorage } from "usehooks-ts";
 import { loggedApi } from "../../infra/http";
-import { MessageView } from "../../mock/messages";
 import { LocalStorageKeys } from "../../storage/keys";
 import { DeleteModal } from "../../ui/components/modal-delete/modal-delete";
 import { useMessages } from "../inbox/inbox";
 import { usePageTitle } from "../../hooks/app/use-page-title";
+import { MessageView } from "./types";
 
 async function deleteMessageFetch(messageId: string): Promise<void> {
   const request = await loggedApi.delete(`/messages/${messageId}`);
@@ -100,7 +100,7 @@ export function MessagePage() {
     <>
       <Box p={7}>
         <Flex alignItems={"center"} justifyContent={"space-between"}>
-          <Skeleton height="14px" w={"400px"} isLoaded={!isLoading}>
+          <Skeleton minH="14px" minW={"400px"} isLoaded={!isLoading}>
             <Text fontWeight={"semibold"}>{message?.subject}</Text>
           </Skeleton>
           <HStack>
