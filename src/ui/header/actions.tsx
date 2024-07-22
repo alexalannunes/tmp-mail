@@ -227,7 +227,7 @@ function MenuAccounts({
 function MenuLanguages() {
   const { t } = useTranslation();
 
-  const [, setLanguage] = useLocalStorage<LanguageType>(
+  const [language, setLanguage] = useLocalStorage<LanguageType>(
     LocalStorageKeys.LANGUAGE,
     { lng: "en" }
   );
@@ -236,6 +236,22 @@ function MenuLanguages() {
     setLanguage({ lng });
     i18n.changeLanguage(lng);
   };
+
+  const supportedLanguages = [
+    {
+      label: t("header.language.en"),
+      language: "en",
+    },
+    {
+      language: "pt",
+      label: t("header.language.pt"),
+    },
+  ];
+
+  // display available language: do not display current language in menu
+  const availableLanguages = supportedLanguages.filter(
+    (lng) => lng.language !== language.lng
+  );
 
   return (
     <Menu>
@@ -247,13 +263,14 @@ function MenuLanguages() {
         icon={<MdTranslate />}
       />
       <MenuList>
-        {/* if we are using english, this item does not need to be display */}
-        <MenuItem onClick={() => handleChangeLanguage("en")}>
-          {t("header.language.en")}
-        </MenuItem>
-        <MenuItem onClick={() => handleChangeLanguage("pt")}>
-          {t("header.language.pt")}
-        </MenuItem>
+        {availableLanguages.map((lang) => (
+          <MenuItem
+            key={lang.language}
+            onClick={() => handleChangeLanguage(lang.language)}
+          >
+            {lang.label}
+          </MenuItem>
+        ))}
       </MenuList>
     </Menu>
   );
